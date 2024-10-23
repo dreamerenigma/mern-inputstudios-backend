@@ -14,7 +14,7 @@ export const signup = async (req, res, next) => {
       email === "" ||
       password === ""
    ) {
-      next(errorHandler(400, "All fields are required"));
+      return next(errorHandler(400, "All fields are required"));
    }
 
    const hashedPassword = bcryptjs.hashSync(password, 10);
@@ -37,7 +37,7 @@ export const signin = async (req, res, next) => {
    const { email, password } = req.body;
 
    if (!email || !password || email === "" || password === "") {
-      next(errorHandler(400, "All fields are required"));
+      return next(errorHandler(400, "All fields are required"));
    }
 
    try {
@@ -56,12 +56,7 @@ export const signin = async (req, res, next) => {
 
       const { password: pass, ...rest } = validUser._doc;
 
-      res
-         .status(200)
-         .cookie("access_token", token, {
-            httpOnly: true,
-         })
-         .json(rest);
+      res.status(200).cookie("access_token", token, { httpOnly: true }).json(rest);
    } catch (error) {
       next(error);
    }
@@ -75,13 +70,9 @@ export const google = async (req, res, next) => {
          const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin },
             process.env.JWT_SECRET
          );
+         console.log("Generated Token:", token); // This should log the token on the server
          const { password, ...rest } = user._doc;
-         res
-            .status(200)
-            .cookie("access_token", token, {
-               httpOnly: true,
-            })
-            .json(rest);
+         res.status(200).cookie("access_token", token, { httpOnly: true }).json({ ...rest, token });
       } else {
          const generatedPassword =
             Math.random().toString(36).slice(-8) +
@@ -99,13 +90,9 @@ export const google = async (req, res, next) => {
          const token = jwt.sign({ id: newUser._id, isAdmin: user.isAdmin },
             process.env.JWT_SECRET
          );
+         console.log("Generated Token:", token); // This should log the token on the server
          const { password, ...rest } = newUser._doc;
-         res
-            .status(200)
-            .cookie("access_token", token, {
-               httpOnly: true,
-            })
-            .json(rest);
+         res.status(200).cookie("access_token", token, { httpOnly: true }).json({ ...rest, token });
       }
    } catch (error) {
       next(error);

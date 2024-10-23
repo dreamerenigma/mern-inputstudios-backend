@@ -58,18 +58,21 @@ export const editComment = async (req, res, next) => {
       if (!comment) {
          return next(errorHandler(404, "Comment not found"));
       }
+
       if (comment.userId !== req.user.id && !req.user.isAdmin) {
+         console.log("User not authorized to edit the comment");
          return next(errorHandler(403, "You are not allowed to edit this comment"));
       }
+
       const editedComment = await Comment.findByIdAndUpdate(
          req.params.commentId,
-         {
-            content: req.body.content,
-         },
+         { content: req.body.content },
          { new: true }
       );
-      res.status(200).json(editedComment)
+      
+      res.status(200).json(editedComment);
    } catch (error) {
+      console.error("Error editing comment:", error.message);
       next(error);
    }
 };
