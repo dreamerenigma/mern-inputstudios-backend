@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+  changePassword,
   deleteUser,
   getUser,
   getUsers,
@@ -17,5 +18,6 @@ router.delete('/delete/:userId', verifyToken, deleteUser);
 router.post('/signout', signout);
 router.get('/getusers', verifyToken, getUsers);
 router.get('/:userId', getUser);
+router.post('/password/change', verifyToken, changePassword);
 
 export default router;
