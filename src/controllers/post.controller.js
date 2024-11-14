@@ -99,3 +99,20 @@ export const updatepost = async (req, res, next) => {
       next(error);
    }
 };
+
+export const incrementViews = async (req, res, next) => {
+   const { postId } = req.params;
+
+   try {
+      const post = await Post.findById(postId);
+      if (post) {
+         post.views = (post.views || 0) + 1;
+         await post.save();
+         res.status(200).json({ views: post.views });
+      } else {
+         res.status(404).json({ error: 'Post not found' });
+      }
+   } catch (error) {
+      next(error);
+   }
+};
