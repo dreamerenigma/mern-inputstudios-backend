@@ -21,6 +21,7 @@
     "jsonwebtoken": "^9.0.2",
     "mern-blog": "file:",
     "mongoose": "^8.3.1",
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.0",
+    "shortid": "^2.2.16"
   }
 }

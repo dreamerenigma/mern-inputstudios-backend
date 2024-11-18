@@ -2,6 +2,10 @@ import mongoose from "mongoose";
 
 const postSchema = new mongoose.Schema(
    {
+      shortId: { 
+         type: String, 
+         unique: true 
+      },
       userId: {
          type: String,
          required: true,
