@@ -32,10 +32,10 @@ export const create = async (req, res, next) => {
 export const getposts = async (req, res, next) => {
    try {
       const startIndex = parseInt(req.query.startIndex) || 0;
-      const limit = parseInt(req.query.limit) || 9;
+      const limit = req.query.limit ? parseInt(req.query.limit) : null;
       const sortDirection = req.query.order === "asc" ? 1 : -1;
-      const posts = await Post.find({
-         ...(req.query.userId && { userId: req.query.userId }),
+
+      const filters = {
          ...(req.query.category && { category: req.query.category }),
          ...(req.query.slug && { slug: req.query.slug }),
          ...(req.query.postId && { _id: req.query.postId }),
@@ -45,12 +45,23 @@ export const getposts = async (req, res, next) => {
                { content: { $regex: req.query.searchTerm, $options: "i" } },
             ],
          }),
-      })
-         .sort({ updatedAt: sortDirection })
-         .skip(startIndex)
-         .limit(limit);
-      
-      const totalPosts = await Post.countDocuments();
+      };
+
+      if (req.query.userId) {
+         if (req.user.isAdmin || req.query.userId === req.user.id) {
+            filters.userId = req.query.userId;
+         } else {
+            return next(errorHandler(403, "You are not allowed to access these posts"));
+         }
+      }
+
+      const postsQuery = Post.find(filters).sort({ updatedAt: sortDirection }).skip(startIndex);
+      if (limit) postsQuery.limit(limit);
+
+      const posts = await postsQuery;
+
+      const totalPosts = await Post.countDocuments(filters);
+
       const now = new Date();
       const oneMonthAgo = new Date(
          now.getFullYear(),
@@ -59,6 +70,7 @@ export const getposts = async (req, res, next) => {
       );
 
       const lastMonthPosts = await Post.countDocuments({
+         ...filters,
          createdAt: { $gte: oneMonthAgo },
       });
 
@@ -71,6 +83,7 @@ export const getposts = async (req, res, next) => {
       next(error);
    }
 };
+
 
 export const deletepost = async (req, res, next) => {
    if (!req.user.isAdmin || req.user.id !== req.params.userId) {
@@ -123,4 +136,3 @@ export const incrementViews = async (req, res, next) => {
       next(error);
    }
 };
-
