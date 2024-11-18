@@ -84,6 +84,33 @@ export const getposts = async (req, res, next) => {
    }
 };
 
+export const likePost = async (req, res, next) => {
+   try {
+      const post = await Post.findById(req.params.postId);
+      if (!post) {
+         return next(errorHandler(404, "Post not found"));
+      }
+
+      const isLiked = post.likes.includes(req.user.id);
+
+      if (isLiked) {
+         post.likes = post.likes.filter((id) => id !== req.user.id);
+         post.numberOfLikes -= 1;
+      } else {
+         post.likes.push(req.user.id);
+         post.numberOfLikes += 1;
+      }
+
+      await post.save();
+
+      res.status(200).json({
+         likes: post.likes,
+         numberOfLikes: post.numberOfLikes,
+      });
+   } catch (error) {
+      next(error);
+   }
+};
 
 export const deletepost = async (req, res, next) => {
    if (!req.user.isAdmin || req.user.id !== req.params.userId) {
@@ -121,18 +148,26 @@ export const updatepost = async (req, res, next) => {
 };
 
 export const incrementViews = async (req, res, next) => {
-   const { postId } = req.params;
+   const postId = req.params.postId;
+   console.log("Received postId:", postId);
 
    try {
-      const post = await Post.findById(postId);
-      if (post) {
-         post.views = (post.views || 0) + 1;
-         await post.save();
-         res.status(200).json({ views: post.views });
-      } else {
-         res.status(404).json({ error: 'Post not found' });
+      if (!mongoose.Types.ObjectId.isValid(postId)) {
+         return res.status(400).json({ error: "Invalid postId format" });
       }
+
+      const post = await Post.findById(postId);
+
+      if (!post) {
+         return next(errorHandler(404, "Post not found"));
+      }
+
+      post.views += 1;
+      await post.save();
+
+      res.status(200).json({ views: post.views });
    } catch (error) {
+      console.log("Error in incrementViews:", error);
       next(error);
    }
 };

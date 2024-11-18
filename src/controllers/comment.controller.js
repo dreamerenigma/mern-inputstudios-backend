@@ -21,6 +21,7 @@ export const createComment = async (req, res, next) => {
 };
 
 export const getPostComments = async (req, res, next) => {
+   console.log("Received request for comments for postId:", req.params.postId);
    try {
       const comments = await Comment.find({ postId: req.params.postId }).sort({
          createdAt: -1,
