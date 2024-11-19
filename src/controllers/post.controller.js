@@ -149,13 +149,8 @@ export const updatepost = async (req, res, next) => {
 
 export const incrementViews = async (req, res, next) => {
    const postId = req.params.postId;
-   console.log("Received postId:", postId);
-
+   console.log("Post ID received:", postId);
    try {
-      if (!mongoose.Types.ObjectId.isValid(postId)) {
-         return res.status(400).json({ error: "Invalid postId format" });
-      }
-
       const post = await Post.findById(postId);
 
       if (!post) {
@@ -167,7 +162,6 @@ export const incrementViews = async (req, res, next) => {
 
       res.status(200).json({ views: post.views });
    } catch (error) {
-      console.log("Error in incrementViews:", error);
       next(error);
    }
 };
