@@ -29,13 +29,21 @@ const postSchema = new mongoose.Schema(
       },
       slug: {
          type: String,
-         reqired: true,
+         required: true,
          unique: true,
       },
       views: {
          type: Number,
          default: 0,
-      }
+      },
+      likes: {
+         type: [String],
+         default: [],
+      },
+      numberOfLikes: {
+         type: Number,
+         default: 0,
+      },
    }, { timestamps: true }
 );
 
