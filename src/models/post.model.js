@@ -44,6 +44,14 @@ const postSchema = new mongoose.Schema(
          type: Number,
          default: 0,
       },
+      dislikes: {
+         type: [String],
+         default: [],
+      },
+      numberOfDislikes: {
+         type: Number,
+         default: 0,
+      },
    }, { timestamps: true }
 );
 

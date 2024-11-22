@@ -91,13 +91,15 @@ export const likePost = async (req, res, next) => {
          return next(errorHandler(404, "Post not found"));
       }
 
-      const isLiked = post.likes.includes(req.user.id);
+      const userId = req.user.id;
+
+      const isLiked = post.likes.includes(userId);
 
       if (isLiked) {
-         post.likes = post.likes.filter((id) => id !== req.user.id);
+         post.likes = post.likes.filter((id) => id !== userId);
          post.numberOfLikes -= 1;
       } else {
-         post.likes.push(req.user.id);
+         post.likes.push(userId);
          post.numberOfLikes += 1;
       }
 
@@ -106,6 +108,39 @@ export const likePost = async (req, res, next) => {
       res.status(200).json({
          likes: post.likes,
          numberOfLikes: post.numberOfLikes,
+      });
+   } catch (error) {
+      next(error);
+   }
+};
+
+export const dislikePost = async (req, res, next) => {
+   try {
+      const post = await Post.findById(req.params.postId);
+      if (!post) {
+         return next(errorHandler(404, "Post not found"));
+      }
+
+      const userId = req.user.id;
+
+      const isDisliked = post.dislikes.includes(userId);
+
+      if (isDisliked) {
+         post.dislikes = post.dislikes.filter((id) => id !== userId);
+         post.numberOfDislikes -= 1;
+      } else {
+
+         post.dislikes.push(userId);
+         post.numberOfDislikes += 1;
+      }
+
+      await post.save();
+
+      res.status(200).json({
+         likes: post.likes,
+         numberOfLikes: post.numberOfLikes,
+         dislikes: post.dislikes,
+         numberOfDislikes: post.numberOfDislikes,
       });
    } catch (error) {
       next(error);
