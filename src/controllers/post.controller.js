@@ -200,3 +200,22 @@ export const incrementViews = async (req, res, next) => {
       next(error);
    }
 };
+
+export const sharePost = async (req, res) => {
+   try {
+      const { postId } = req.params;
+      const post = await Post.findById(postId);
+
+      if (!post) {
+         return res.status(404).json({ message: "Пост не найден" });
+      }
+
+      post.shareCount += 1;
+      await post.save();
+
+      res.status(200).json({ message: "Пост успешно поделился", shareCount: post.shareCount });
+   } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Ошибка при обработке запроса" });
+   }
+};
