@@ -22,6 +22,11 @@ const commentSchema = new mongoose.Schema(
          type: Number,
          default: 0,
       },
+      replyTo: {
+         type: mongoose.Schema.Types.ObjectId,
+         ref: "Comment",
+         default: null,
+      },
    }, { timestamps: true }
 );
 

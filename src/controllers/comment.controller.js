@@ -120,3 +120,23 @@ export const getComments = async (req, res, next) => {
       next(error);
    }
 };
+
+export const replyToComment = async (req, res, next) => {
+   try {
+      const { commentId } = req.params;
+      const { content } = req.body;
+      const { userId, postId } = req.user;
+
+      const reply = new Comment({
+         content,
+         postId,
+         userId,
+         replyTo: commentId,
+      });
+
+      await reply.save();
+      res.status(200).json(reply);
+   } catch (error) {
+      res.status(500).json({ message: "Error while replying to comment", error });
+   }
+};
