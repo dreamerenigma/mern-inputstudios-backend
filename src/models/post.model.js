@@ -7,8 +7,9 @@ const postSchema = new mongoose.Schema(
          unique: true 
       },
       userId: {
-         type: String,
+         type: mongoose.Schema.Types.ObjectId, 
          required: true,
+         ref: 'User'
       },
       content: {
          type: String,
@@ -21,7 +22,7 @@ const postSchema = new mongoose.Schema(
       },
       image: {
          type: String,
-         default: "https://i.ibb.co/s2jhDPr/blog-post.webp",
+         default: "https://i.ibb.co/09wbb3z/blog-post.png",
       },
       category: {
          type: String,
@@ -55,7 +56,11 @@ const postSchema = new mongoose.Schema(
       shareCount: {
          type: Number,
          default: 0,
-      }
+      },
+      sharedBy: { 
+         type: [mongoose.Schema.Types.ObjectId], 
+         ref: 'User' 
+      },
    }, { timestamps: true }
 );
 
