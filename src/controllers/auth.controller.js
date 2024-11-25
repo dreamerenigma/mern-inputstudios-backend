@@ -40,18 +40,24 @@ export const signin = async (req, res, next) => {
       return next(errorHandler(400, "All fields are required"));
    }
 
+   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+   if (!emailRegex.test(email)) {
+      return next(errorHandler(400, "Invalid email format"));
+   }
+
    try {
       const validUser = await User.findOne({ email });
       if (!validUser) {
          return next(errorHandler(400, 'User not found'));
       }
-      const validPassword = bcryptjs.compareSync(password, validUser.password);
+      const validPassword = await bcryptjs.compare(password, validUser.password);
       if (!validPassword) {
          return next(errorHandler(400, "Invalid password"));
       }
       const token = jwt.sign(
          { id: validUser._id, isAdmin: validUser.isAdmin },
-         process.env.JWT_SECRET
+         process.env.JWT_SECRET,
+         { expiresIn: "1h" }
       );
 
       const { password: pass, ...rest } = validUser._doc;
