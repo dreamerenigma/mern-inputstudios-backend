@@ -5,6 +5,7 @@ import {
    deleteComment,
    editComment,
    getComments,
+   getCommentsCount,
    getPostComments,
    likeComment,
    replyToComment,
@@ -19,5 +20,6 @@ router.put("/editComment/:commentId", verifyToken, editComment);
 router.delete("/deleteComment/:commentId", verifyToken, deleteComment);
 router.get("/getcomments", verifyToken, getComments);
 router.post("/reply/:commentId", verifyToken, replyToComment);
+router.get("/count/:postId", getCommentsCount);
 
 export default router;

@@ -140,3 +140,16 @@ export const replyToComment = async (req, res, next) => {
       res.status(500).json({ message: "Error while replying to comment", error });
    }
 };
+
+export const getCommentsCount = async (req, res) => {
+   try {
+      const { postId } = req.params;
+
+      const commentsCount = await Comment.countDocuments({ postId });
+
+      res.status(200).json({ count: commentsCount });
+   } catch (error) {
+      console.error("Ошибка получения количества комментариев:", error.message);
+      res.status(500).json({ message: "Ошибка сервера" });
+   }
+};
