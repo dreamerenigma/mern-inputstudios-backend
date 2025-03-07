@@ -201,21 +201,51 @@ export const incrementViews = async (req, res, next) => {
    }
 };
 
+export const addBookmark = async (req, res) => {
+   try {
+      const { postId } = req.params;
+
+      if (!req.user || !req.user._id) {
+         console.warn('Идентификатор пользователя не найден в токене');
+         return res.status(401).json({ message: "Пользователь не аутентифицирован" });
+      }
+
+      const userId = req.user._id;
+      
+   } catch (error) {
+      res.status(500).json({ message: "Ошибка на сервере", error: error.message });
+   }
+};
+
 export const sharePost = async (req, res) => {
    try {
       const { postId } = req.params;
-      const post = await Post.findById(postId);
 
+      if (!req.user || !req.user._id) {
+         console.warn('Идентификатор пользователя не найден в токене');
+         return res.status(401).json({ message: "Пользователь не аутентифицирован" });
+      }
+
+      const userId = req.user._id;
+
+      const post = await Post.findById(postId);
       if (!post) {
+         console.warn('Post not found');
          return res.status(404).json({ message: "Пост не найден" });
       }
 
-      post.shareCount += 1;
-      await post.save();
+      if (post.sharedBy.includes(userId)) {
+         console.warn('Пользователь уже поделился этим постом');
+         return res.status(400).json({ message: "Вы уже поделились этим постом" });
+      }
 
+      post.shareCount += 1;
+      post.sharedBy.push(userId);
+
+      await post.save();
       res.status(200).json({ message: "Пост успешно поделился", shareCount: post.shareCount });
    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Ошибка при обработке запроса" });
+      console.error('Ошибка в sharePost:', error.stack);
+      res.status(500).json({ message: "Ошибка на сервере", error: error.message });
    }
 };
